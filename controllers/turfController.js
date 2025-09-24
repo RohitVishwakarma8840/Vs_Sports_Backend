@@ -62,6 +62,45 @@ const getAllTurfs = async (req, res) => {
   }
 };
 
+const getTurfById = async (req, res) => {
+  try {
+    const turf = await Turf.findById(req.params.id);
+    if (!turf) {
+      return res.status(404).json({ msg: 'Turf not found' });
+    }
+    res.status(200).json({ msg: 'Turf retrieved successfully', turf });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
 
 
-module.exports = { createTurf,getAllTurfs };
+// Delete a turf by ID
+const deleteTurfById = async (req, res) => {
+  try {
+    const turfId = req.params.id;
+
+    // Check if the turf exists
+    const turf = await Turf.findById(turfId);
+    if (!turf) {
+      return res.status(404).json({ msg: 'Turf not found' });
+    }
+  
+
+    // Delete the turf
+    await Turf.findByIdAndDelete(turfId);
+
+    res.status(200).json({ msg: 'Turf deleted successfully' });
+  } catch (err) {
+    console.error(err.message);
+ 
+    if (err.kind === 'ObjectId') {
+      return res.status(400).json({ msg: 'Invalid turf ID' });
+    }
+    res.status(500).send('Server error');
+  }
+};
+
+
+module.exports = { createTurf,getAllTurfs, getTurfById,deleteTurfById };

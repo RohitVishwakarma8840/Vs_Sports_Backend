@@ -21,10 +21,10 @@ router.post(
 );
 
 // Get all Turfs (public)
-router.get('/all-turfs', turfController.getAllTurfs);
+router.get('/all-turfs',auth,managerOnly, turfController.getAllTurfs);
 
 // Get single Turf by ID (public)
-// router.get('/:id', turfController.getTurfById);
+router.get('/:id', turfController.getTurfById);
 
 // Update Turf (only manager/admin)
 // router.put(
@@ -39,6 +39,6 @@ router.get('/all-turfs', turfController.getAllTurfs);
 // );
 
 // Delete Turf (only manager/admin)
-// router.delete('/:id', auth, turfController.deleteTurf);
+router.delete('/:id', auth,managerOnly, turfController.deleteTurfById);
 
 module.exports = router;
