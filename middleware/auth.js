@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = function (req, res, next) {
-  const token = req.header('x-auth-token'); // client should send token in this header
+  const token = req.header('x-auth-token'); // sending the token 
   if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
 
   try {
@@ -11,4 +11,12 @@ module.exports = function (req, res, next) {
   } catch (err) {
     res.status(401).json({ msg: 'Token is not valid' });
   }
+};
+
+
+const managerOnly = (req, res, next) => {
+  if (req.user.userType !== 'manager') {
+    return res.status(403).json({ msg: 'Access denied: Managers only' });
+  }
+  next();
 };

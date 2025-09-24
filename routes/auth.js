@@ -2,17 +2,20 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const authController = require('../controllers/authController');
+const auth = require('../middleware/auth');
 
+// Register (always creates customer)
 router.post(
   '/register',
   [
     check('name', 'Name is required').not().isEmpty(),
     check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Password must be 6 or more characters').isLength({ min: 6 })
+    check('password', 'Password must be 6 or more characters').isLength({ min: 6 }),
   ],
   authController.register
 );
 
+// Login
 router.post(
   '/login',
   [
@@ -22,8 +25,7 @@ router.post(
   authController.login
 );
 
-
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+// Create Manager (protected)
+router.post('/create-manager', auth, authController.createManager);
 
 module.exports = router;
