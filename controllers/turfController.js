@@ -48,4 +48,20 @@ const createTurf = async (req, res) => {
   }
 };
 
-module.exports = { createTurf };
+// Get all turfs
+const getAllTurfs = async (req, res) => {
+  try {
+    const turfs = await Turf.find(); // Fetch all turfs from the database
+    if (!turfs || turfs.length === 0) {
+      return res.status(404).json({ msg: 'No turfs found' });
+    }
+    res.status(200).json({ msg: 'Turfs retrieved successfully', turfs });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+
+
+module.exports = { createTurf,getAllTurfs };

@@ -21,7 +21,7 @@ router.post(
 );
 
 // Get all Turfs (public)
-// router.get('/', turfController.getAllTurfs);
+router.get('/all-turfs', turfController.getAllTurfs);
 
 // Get single Turf by ID (public)
 // router.get('/:id', turfController.getTurfById);
