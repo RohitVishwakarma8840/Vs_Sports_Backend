@@ -107,6 +107,7 @@ const createManager = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
+    // console.log("control here");
 
     user = new User({
       name,
@@ -115,7 +116,9 @@ const createManager = async (req, res) => {
       userType: 'manager'
     });
 
+    // console.log("manager create ", user);
     await user.save();
+
 
     // Optional: generate token for the manager
     const payload = { user: { id: user.id, userType: user.userType } };
