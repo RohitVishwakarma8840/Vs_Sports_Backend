@@ -7,7 +7,7 @@ require("dotenv").config();
 app.use(express.json()); 
 
 
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth.route');
 app.use('/api/auth', authRoutes);
 
 // Turf routes
