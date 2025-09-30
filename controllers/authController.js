@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 require("dotenv").config();
+const Turf = require('../models/Turf');
 
 
 // const register = async (req, res) => {
@@ -40,7 +41,7 @@ const register = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ status:400, errors: errors.array() });
 
-  const { name, email, password } = req.body; // ignore userType
+  const { name, email, password } = req.body; 
   try {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ status: 400,  msg: 'User already exists' });
@@ -48,7 +49,7 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
 
-    // Force 'customer' role for normal registration
+    
     user = new User({ name, email, password: hashed, userType: 'customer' });
     await user.save();
 
@@ -82,7 +83,10 @@ const login = async (req, res) => {
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({ token, userType: user.userType , status:200,msg:'Login successful'});
+    res.json({ token, userType: user.userType , status:200,msg:'Login successful', 
+      user: { id: user.id, name: user.name, email: user.email, userType: user.userType }
+
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ status: 500, msg:'Server error'});
@@ -96,7 +100,7 @@ const createManager = async (req, res) => {
 
   const { name, email, password, secret } = req.body;
 
-  // Only allow if secret matches your server-side key
+  
   if (secret !== process.env.ADMIN_SECRET) {
     return res.status(403).json({  status: 403, msg: 'Not authorized to create manager' });
   }
@@ -120,7 +124,7 @@ const createManager = async (req, res) => {
     await user.save();
 
 
-    // Optional: generate token for the manager
+   
     const payload = { user: { id: user.id, userType: user.userType } };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
@@ -132,6 +136,40 @@ const createManager = async (req, res) => {
 };
 
 
-module.exports = { register, login, createManager };
+const getUserBookings  = async(req,res)=>{
+
+  try {
+    const { userId } = req.params;
+
+    // 1️⃣ Find all turfs where any slot is booked by this user
+    const turfs = await Turf.find({ "availableSlots.bookedBy": userId })
+      .populate("availableSlots.bookedBy", "name email"); // optional: get user info
+
+    // 2️⃣ Filter only the slots booked by this user
+    const userBookings = turfs.map(turf => {
+      return {
+        turfId: turf._id,
+        turfName: turf.name,
+        location: turf.location,
+        price: turf.price,
+        bookedSlots: turf.availableSlots.filter(
+          slot => slot.bookedBy && slot.bookedBy._id.toString() === userId
+        ).map(slot => ({
+          slotId: slot._id,
+          time: slot.time,
+          date: slot.date,
+          isBooked: slot.isBooked
+        }))
+      };
+    });
+
+    res.status(200).json({status:200 ,bookings: userBookings });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+}
+
+module.exports = { register, login, createManager,getUserBookings };
 
 

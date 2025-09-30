@@ -21,24 +21,29 @@ router.post(
 );
 
 // Get all Turfs (public)
-router.get('/all-turfs',auth,managerOnly, turfController.getAllTurfs);
+router.get('/all-turfs', turfController.getAllTurfs);
 
 // Get single Turf by ID (public)
 router.get('/:id', turfController.getTurfById);
 
 // Update Turf (only manager/admin)
-// router.put(
-//   '/:id',
-//   auth,
-//   [
-//     check('name', 'Name is required').optional().not().isEmpty(),
-//     check('location', 'Location is required').optional().not().isEmpty(),
-//     check('price', 'Price should be numeric').optional().isNumeric(),
-//   ],
-//   turfController.updateTurf
-// );
+router.put(
+  '/:id',
+  auth,
+  managerOnly,
+  upload.single('image'),
+  [
+    check('name', 'Name is required').optional().not().isEmpty(),
+    check('location', 'Location is required').optional().not().isEmpty(),
+    check('price', 'Price should be numeric').optional().isNumeric(),
+  ],
+  turfController.updateTurfById
+);
 
 // Delete Turf (only manager/admin)
 router.delete('/:id', auth,managerOnly, turfController.deleteTurfById);
+
+// Booking  a Turf 
+router.post('/:turfId/book',auth, turfController.bookTurf);
 
 module.exports = router;

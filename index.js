@@ -6,6 +6,10 @@ const upload = require('./middleware/upload');
 require("dotenv").config();
 app.use(express.json()); 
 
+const cors = require('cors');
+
+
+app.use(cors());
 
 const authRoutes = require('./routes/auth.route');
 app.use('/api/auth', authRoutes);
@@ -16,6 +20,7 @@ app.use('/api/turfs', turfRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello from Express!');
+  // res.json({status:200})
 });
 
 

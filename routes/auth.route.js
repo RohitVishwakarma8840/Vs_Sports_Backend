@@ -29,4 +29,6 @@ router.post(
 // Create Manager (protected)
 router.post('/create-manager', auth, authController.createManager);
 
+router.get('/:userId/bookings',  authController.getUserBookings);
+
 module.exports = router;

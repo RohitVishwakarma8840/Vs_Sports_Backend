@@ -7,9 +7,14 @@ const TurfSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   image:{type:String, required:true},
   availableSlots: [{
-    time: { type: String, required: true }, // e.g., "10:00 AM"
-    isBooked: { type: Boolean, default: false }
+    time: { type: String}, // e.g., "10:00 AM"
+    isBooked: { type: Boolean, default: false },
+    bookedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+      date: { type: Date, default: null } 
+
   }],
+  // availableSolts: {type:String,required:true}, // Comma-separated time slots
+  // isBooked: { type: Boolean, default: false },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to the manager 
 }, { timestamps: true });
 
