@@ -67,7 +67,7 @@ const getTurfById = async (req, res) => {
     if (!turf) {
       return res.status(404).json({ status: 404,  msg: 'Turf not found' });
     }
-    res.status(200).json({  status: 400, msg: 'Turf retrieved successfully', 
+    res.status(200).json({  status: 200, msg: 'Turf retrieved successfully', 
       turf: {
         id: turf._id,
         name: turf.name,
@@ -193,10 +193,50 @@ const bookTurf = async (req, res) => {
 };
 
 
+// Delete a booking (Admin only)
+const deleteBooking = async (req, res) => {
+  try {
+    const { turfId, slotId } = req.params;
+
+    // 1️⃣ Find turf
+    const turf = await Turf.findById(turfId);
+    if (!turf) {
+      return res.status(404).json({ status: 404, msg: 'Turf not found' });
+    }
+
+    // 2️⃣ Find slot
+    const slot = turf.availableSlots.id(slotId);
+    if (!slot) {
+      return res.status(404).json({ status: 404, msg: 'Slot not found' });
+    }
+
+    // 3️⃣ Check if slot is actually booked
+    if (!slot.isBooked) {
+      return res.status(400).json({ status: 400, msg: 'This slot is not booked' });
+    }
+
+    // 4️⃣ Reset the slot to make it available again
+    slot.isBooked = false;
+    slot.bookedBy = null;
+    slot.date = null;
+
+    // 5️⃣ Save the turf
+    await turf.save();
+
+    res.status(200).json({ status: 200, msg: 'Booking deleted successfully', turf });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 500, msg: 'Server error' });
+  }
+};
 
 
 
-module.exports = { createTurf, getAllTurfs, getTurfById, deleteTurfById, updateTurfById,bookTurf };
+
+
+
+
+module.exports = { createTurf, getAllTurfs, getTurfById, deleteTurfById, updateTurfById,bookTurf,deleteBooking };
 
 
 

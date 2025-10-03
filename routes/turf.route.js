@@ -46,4 +46,9 @@ router.delete('/:id', auth,managerOnly, turfController.deleteTurfById);
 // Booking  a Turf 
 router.post('/:turfId/book',auth, turfController.bookTurf);
 
+// Delete Booking 
+router.post('//:turfId/slots/:slotId/booking',managerOnly,turfController.deleteBooking)
+
+
+
 module.exports = router;
