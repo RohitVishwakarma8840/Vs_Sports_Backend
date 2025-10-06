@@ -231,6 +231,41 @@ const deleteBooking = async (req, res) => {
 };
 
 
+const getAllBooking = async (req, res) => {
+  try {
+    // Find all turfs where at least one slot is booked
+    const turfs = await Turf.find({ "availableSlots.isBooked": true })
+      .populate("availableSlots.bookedBy", "name email"); // optional: show user info
+
+    if (!turfs || turfs.length === 0) {
+      return res.status(404).json({ status: 404, msg: "No bookings found" });
+    }
+
+    // Extracting only booked slots from each turf
+    const bookings = turfs.map(turf => ({
+      turfId: turf._id,
+      name: turf.name,
+      location: turf.location,
+      bookings: turf.availableSlots
+        .filter(slot => slot.isBooked) // only keep booked slots
+        .map(slot => ({
+          slotId: slot._id,
+          time: slot.time,
+          date: slot.date,
+          bookedBy: slot.bookedBy, // populated user details 
+        }))
+    }));
+
+    res.status(200).json({
+      status: 200,
+      msg: "All booked slots retrieved successfully",
+      bookings,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 500, msg: "Server error" });
+  }
+};
 
 
 

@@ -10,7 +10,12 @@ const TurfSchema = new mongoose.Schema({
     time: { type: String}, // e.g., "10:00 AM"
     isBooked: { type: Boolean, default: false },
     bookedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-      date: { type: Date, default: null } 
+      date: { type: Date, default: null } ,
+      bookingStatus:{
+        type:String,
+        enum:['pending','approved','rejected'],
+        default:'pending'
+      },
 
   }],
   // availableSolts: {type:String,required:true}, // Comma-separated time slots
