@@ -2,9 +2,11 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const upload = require('./middleware/upload');
+const mongoSanitize = require('express-mongo-sanitize');
 
 require("dotenv").config();
-app.use(express.json()); 
+app.use(mongoSanitize());
+app.use(express.json());
 
 const cors = require('cors');
 

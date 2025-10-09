@@ -158,8 +158,9 @@ const getUserBookings  = async(req,res)=>{
           slotId: slot._id,
           time: slot.time,
           date: slot.date,
-          isBooked: slot.isBooked
-        }))
+          isBooked: slot.isBooked,
+          bookingStatus: slot.bookingStatus
+        })),
       };
     });
 

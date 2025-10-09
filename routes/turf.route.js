@@ -49,6 +49,10 @@ router.post('/:turfId/book',auth, turfController.bookTurf);
 // Delete Booking 
 router.post('/:turfId/slots/:slotId/booking',auth,managerOnly,turfController.deleteBooking)
 
+// get All Booking 
+router.get('/users/AllBooking', auth,turfController.getAllBooking);
 
+// Update Status of the Booking like Pending Approving etc i 
+router.patch('/:turfId/slots/:slotId/status',auth, managerOnly,turfController.updateStatus);
 
 module.exports = router;
