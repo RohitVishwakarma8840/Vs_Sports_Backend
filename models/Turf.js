@@ -1,18 +1,32 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const sanitizeHtml = require('sanitize-html');
+
 
 const TurfSchema = new mongoose.Schema({
-  name: { type: String, required: true,
+  name: { type: String, 
+    required: [true,"Name is Required"]
+    ,
     minlength: [3,"Name must be greater than 3"],
     maxlength: [20, 'Name should not be greater than that '],
     trim: true, 
     unique:true,
+     validate: {
+    validator: function (v) {
+      return validator.isAlphanumeric(validator.blacklist(v, ' '));
+    },
+    message: "Invalid name — letters and numbers only",
+  },
+      set: v => sanitizeHtml(v, { allowedTags: [], allowedAttributes: {} }),
+
    },
   description : {type:String,required:true,
-    minlength: [6,"Description should be greater than that "],
-    maxlength: [150,"Description should not be greater than 100"],
+    minlength: [50,"Description should be greater than that "],
+    maxlength: [500,"Description should not be greater than 300"],
     trim:true,
-    unique:true
+    unique:true,
+    set: v => sanitizeHtml(v, { allowedTags: [], allowedAttributes: {} }),
+
 
   },
   location: { type: String, required: true,

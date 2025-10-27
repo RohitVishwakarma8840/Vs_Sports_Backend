@@ -5,7 +5,12 @@ const upload = require('./middleware/upload');
 const mongoSanitize = require('express-mongo-sanitize');
 
 require("dotenv").config();
-app.use(mongoSanitize());
+// app.use(mongoSanitize());
+// app.use(
+//   mongoSanitize({
+//     replaceWith: '_', // replaces $ and . with _ instead of mutating
+//   })
+// );
 app.use(express.json());
 
 const cors = require('cors');

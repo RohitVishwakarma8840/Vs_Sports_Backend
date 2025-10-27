@@ -49,20 +49,25 @@ const moment = require('moment');
 // };
 
 
-
 // Create Turf without date in slots
 const createTurf = async (req, res) => {
   try {
     // 1️⃣ Check if image exists
     if (!req.file) {
-      return res.status(400).json({ status: 400, msg: 'Image is required' });
+      return res.status(400).json({ errors: { image: 'Image is required' } }); // Field-specific
     }
 
     const { name, description, location, price, availableSlots } = req.body;
 
     // 2️⃣ Validate required fields
-    if (!name || !description || !location || !price || !availableSlots) {
-      return res.status(400).json({ status: 400, msg: 'All fields are required' });
+    const requiredFields = { name, description, location, price, availableSlots };
+    const missingFields = Object.keys(requiredFields).filter(key => !requiredFields[key]);
+    if (missingFields.length > 0) {
+      return res.status(400).json({ 
+        errors: { 
+          general: `Missing required fields: ${missingFields.join(', ')}` 
+        } 
+      }); // Or map to specific: { [missingFields[0]]: 'All fields are required' }
     }
 
     // 3️⃣ Parse availableSlots
@@ -72,7 +77,7 @@ const createTurf = async (req, res) => {
         ? JSON.parse(availableSlots)
         : availableSlots;
     } catch (err) {
-      return res.status(400).json({ status: 400, msg: 'Invalid availableSlots format' });
+      return res.status(400).json({ errors: { availableSlots: 'Invalid availableSlots format' } });
     }
 
     // 4️⃣ Process slots → calculate 1-hour endTime and remove duplicates
@@ -115,6 +120,13 @@ const createTurf = async (req, res) => {
 
     res.status(201).json({ status: 201, msg: 'Turf created successfully', turf });
   } catch (err) {
+    if (err.name === "ValidationError") {
+      const fieldErrors = {}; // Object for field-specific
+      Object.keys(err.errors).forEach(key => {
+        fieldErrors[key] = err.errors[key].message;
+      });
+      return res.status(400).json({ errors: fieldErrors }); // e.g., { location: "Location must be at least 3..." }
+    }
     console.error(err.message);
     res.status(500).json({ status: 500, msg: 'Server Error' });
   }
